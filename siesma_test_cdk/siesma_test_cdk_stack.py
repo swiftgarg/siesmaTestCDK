@@ -1,6 +1,8 @@
 from aws_cdk import (aws_ecs as ecs, aws_ecr as ecr, aws_ec2 as ec2, aws_iam as iam, aws_ecs_patterns as ecs_patterns, Stack, CfnOutput)
 from constructs import Construct
 
+//Have followed aws resource at https://aws.amazon.com/blogs/containers/create-a-ci-cd-pipeline-for-amazon-ecs-with-github-actions-and-aws-codebuild-tests/
+//to create a pipeline between ecs and github for continuous deployment and integration via git
 class siesmaECSCdkStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
@@ -9,15 +11,15 @@ class siesmaECSCdkStack(Stack):
         # Create the ECR Repository
         ecr_repository = ecr.Repository(self,
                                         "ecs-siesma-repository",
-                                        repository_name="ecs-siesma-repository")
+                                        repository_name="ecs-siesma-repository")                        //repo name siesma
 
         # Create the ECS Cluster (and VPC)
         # Deploying to only two AZ to save money
         vpc = ec2.Vpc(self,
-                      "ecs-siesma-vpc",
+                      "ecs-siesma-vpc",//our vpc name
                       max_azs=2)
         cluster = ecs.Cluster(self,
-                              "ecs-siesma-cluster",
+                              "ecs-siesma-cluster",// Our cluster name
                               cluster_name="ecs-siesma-cluster",
                               vpc=vpc)
 
@@ -39,11 +41,11 @@ class siesmaECSCdkStack(Stack):
                 ]
         ))
         task_definition = ecs.FargateTaskDefinition(self,
-                                                    "ecs-siesma-task-definition",
+                                                    "ecs-siesma-task-definition",// task def 
                                                     execution_role=execution_role,
                                                     family="ecs-siesma-task-definition")
         container = task_definition.add_container(
-            "ecs-siesma",
+            "ecs-siesma",//Container name that we use
             image=ecs.ContainerImage.from_registry("amazon/amazon-ecs-sample"),
         )
         container.add_port_mappings(ecs.PortMapping(container_port=8080, host_port=8080, protocol=ecs.Protocol.TCP))
@@ -56,7 +58,7 @@ class siesmaECSCdkStack(Stack):
             self, "ecs-siesma-service",
             cluster = cluster,
             task_definition = task_definition,
-            service_name = "ecs-siesma-service",
+            service_name = "ecs-siesma-service",// service name
             listener_port=8080,
             cpu=256,
             memory_limit_mib=512,
