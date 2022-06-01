@@ -48,7 +48,7 @@ class siesmaECSCdkStack(Stack):
             "ecs-siesma",//Container name that we use
             image=ecs.ContainerImage.from_registry("amazon/amazon-ecs-sample"),
         )
-        container.add_port_mappings(ecs.PortMapping(container_port=8080, host_port=8080, protocol=ecs.Protocol.TCP))
+        container.add_port_mappings(ecs.PortMapping(container_port=9090, host_port=9090, protocol=ecs.Protocol.TCP))
 
         # Create the ECS Service, NLB backed for access
         ## We set very low cap and desired capacity. We can also
@@ -59,7 +59,7 @@ class siesmaECSCdkStack(Stack):
             cluster = cluster,
             task_definition = task_definition,
             service_name = "ecs-siesma-service",// service name
-            listener_port=8080,
+            listener_port=9090,
             cpu=256,
             memory_limit_mib=512,
             desired_count=1
@@ -67,7 +67,7 @@ class siesmaECSCdkStack(Stack):
 
         fargate_service.service.connections.security_groups[0].add_ingress_rule(
             peer = ec2.Peer.ipv4(vpc.vpc_cidr_block),
-            connection = ec2.Port.tcp(8080),
+            connection = ec2.Port.tcp(9090),
             description="Allow http inbound from VPC"
         )
 
